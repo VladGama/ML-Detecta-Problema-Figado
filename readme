@@ -1,0 +1,137 @@
+MACHINE LEARNING PARA DETECÇÃO DE DOENÇAS HEPÁTICAS 
+  Project by Vladimir Gama
+
+Contexto
+Os pacientes com doença hepática têm aumentado continuamente devido ao consumo excessivo de álcool, inalação de gases nocivos, ingestão de alimentos contaminados, bem como uso de medicamentos. Este conjunto de dados foi usado para possibilitar a criação de Máquinas Preditivas com algoritmos de previsão num esforço para reduzir a carga sobre os médicos.
+
+01-DETECTAR O PROBLEMA DE NEGÓCIO
+Precisamos construir uma Máquina Preditiva que, a partir de dados históricos de pacientes, determine quais pacientes têm doença hepática e quais não têm.
+________________________________________
+2 – ANÁLISE EXPLORATÓRIO DOS DADOS
+2.1 - IMPORTAÇÃO DAS BIBLIOTECAS DE ANÁLISE DE DADOS E VISUALIZAÇÃO
+•	Pandas - é uma biblioteca de análise de dados em Python que fornece estruturas de dados flexíveis e ferramentas para manipulação e análise de dados tabulares e séries temporais. Seaborn:
+•	Seaborn - é uma biblioteca de visualização de dados em Python baseada em matplotlib. Ela fornece uma interface de alto nível para criar visualizações estatísticas atraentes e informativas. Matplotlib:
+•	Matplotlib - é uma biblioteca de visualização de dados em Python amplamente utilizada para criar gráficos estáticos, gráficos interativos e visualizações personalizadas. É a base de muitas outras bibliotecas de visualização em Python. Essas três bibliotecas são frequentemente usadas em conjunto para análise e visualização de dados em Python, proporcionando uma gama poderosa de ferramentas para cientistas de dados e analistas explorarem e comunicarem os insights dos dados de forma eficaz.
+________________________________________
+
+2.2 - IMPORTAÇÃO DE BIBLIOTECAS E CLASSES ÚTEIS PARA AS TAREFAS DE MACHINE LEARNING
+Segue breve explicação das funcionalidades básicas do que cada uma delas executa:
+•	LabelEncoder (sklearn.preprocessing): esta classe é usada para transformar variáveis categóricas em números inteiros. É comumente usado para converter os rótulos de classe em valores numéricos para algoritmos de aprendizado de máquina.
+•	train_test_split (sklearn.model_selection): esta função é usada para dividir os dados em conjuntos de treinamento e teste. O conjunto de treinamento é usado para treinar o modelo, enquanto o conjunto de teste é usado para avaliar o desempenho do modelo em dados não vistos.
+•	RandomForestClassifier (sklearn.ensemble): esta é uma implementação da técnica do algorito Random Forest para classificação. É um algoritmo de aprendizado de máquina supervisionado que cria uma coleção de árvores de decisão durante o treinamento e faz previsões combinando as previsões de cada árvore individual.
+•	XGBClassifier (xgboost):esta é uma implementação do algoritmo XGBoost para classificação. XGBoost é uma biblioteca de aprendizado de máquina otimizada para desempenho e precisão, especialmente eficaz em conjuntos de dados grandes e complexos.
+•	plot_importance (xgboost): esta função é usada para plotar a importância das características (features) aprendidas pelo modelo XGBoost. Isso pode ajudar a identificar quais características são mais influentes para as previsões do modelo.
+•	classification_report (sklearn.metrics): classification_report é uma função que gera um relatório de métricas de avaliação de classificação, incluindo precisão, recall e pontuação F1, para cada classe.
+•	accuracy_score (sklearn.metrics): accuracy_score é uma função que calcula a acurácia das previsões do modelo.
+•	confusion_matrix (sklearn.metrics): confusion_matrix é uma função que calcula a matriz de confusão, que é uma tabela que descreve o desempenho do modelo de classificação em um conjunto de dados de teste.
+•	ConfusionMatrixDisplay (sklearn.metrics): ConfusionMatrixDisplay é uma classe para visualizar a matriz de confusão de uma forma mais intuitiva.
+•	warnings: o módulo warnings é usado para controlar advertências que podem ser emitidas durante a execução do código. Ao usar warnings.filterwarnings ('ignore'), você está configurando o Python para ignorar todas as advertências durante a execução do código.
+________________________________________
+2.3 – IMPORTAÇÃO DE DADOS
+Este conjunto de dados foi baixado do Repositório UCI ML: Lichman, M. (2013). UCI Machine Learning Repository [ http://archive.ics.uci.edu/ml . Irvine, CA: Universidade da Califórnia, Escola de Informação e Ciência da Computação.
+(https://archive.ics.uci.edu/dataset/225/ilpd+indian+liver+patient+dataset)
+Esta linha de código usa a função read_csv() do pandas para ler o arquivo CSV do caminho fornecido e armazena os dados em um DataFrame chamado df.
+________________________________________
+2.4 – DISTRIBUIÇÃO DOS RÓTULOS
+Este código utiliza as bibliotecas Seaborn e Matplotlib para visualizar a distribuição dos rótulos da coluna 'Dataset' do DataFrame df. 
+Aqui está uma explicação passo a passo do que o código faz:
+•	import seaborn as sns e import matplotlib.pyplot as plt: essas linhas de código importam as bibliotecas Seaborn e Matplotlib, respectivamente. Seaborn é uma biblioteca de visualização de dados baseada em Matplotlib, tornando mais fácil criar visualizações estatísticas atraentes.
+•	print(df['Dataset'].value_counts()): esta linha de código calcula e imprime a contagem de valores únicos na coluna 'Dataset' do DataFrame df. Isso permite visualizar a distribuição dos rótulos na coluna.
+•	sns.countplot(df['Dataset']): esta linha de código cria um gráfico de contagem usando a função countplot() do Seaborn. Ele mostra a contagem de cada valor único na coluna 'Dataset'. Os rótulos da coluna 'Dataset' são plotados no eixo x e as contagens são plotadas no eixo y.
+•	plt.show():esta linha de código exibe o gráfico criado usando a Matplotlib. Ele mostra o gráfico de contagem gerado pelo Seaborn.
+Juntos, esses trechos de código fornecem uma maneira rápida e fácil de visualizar a distribuição dos rótulos na coluna 'Dataset' do DataFrame df. Isso é útil para entender a distribuição dos dados e pode ajudar na análise exploratória inicial.
+________________________________________
+3 - PRÉ-PROCESSAMENTO DE DADOS
+
+3.1 - REMOÇÃO DE VALORES NULOS
+
+Esse código remove todas as linhas do DataFrame df que contenham valores ausentes (NaN) e, em seguida, imprime informações sobre o DataFrame após essa operação. 
+Aqui está uma explicação do que cada parte do código faz:
+•	df.dropna(inplace=True): esta linha de código remove todas as linhas do DataFrame df que contêm valores ausentes (NaN). O parâmetro inplace=True indica que a modificação deve ser feita no próprio DataFrame df, em vez de criar uma cópia modificada. Portanto, após esta linha ser executada, o DataFrame df será alterado para conter apenas as linhas sem valores ausentes.
+•	df.info(): esta linha de código imprime informações sobre o DataFrame df, como o número total de entradas não nulas em cada coluna e o tipo de dados de cada coluna. Isso é útil para verificar se a remoção de valores ausentes foi bem-sucedida e entender a estrutura do DataFrame após a operação.
+Juntas, essas duas partes do código permitem verificar e confirmar se a remoção de valores ausentes foi realizada com sucesso e como isso afetou a estrutura do DataFrame df. Isso é importante para garantir a qualidade e a integridade dos dados antes de prosseguir com qualquer análise adicional.
+________________________________________
+3.2 - CONVERSÃO DE STRINGS EM VALORES NUMÉRICOS
+
+3.2.1 - Coluna Sex
+Este código a seguir utiliza o LabelEncoder da biblioteca scikit-learn para converter os valores da coluna 'Sex' do DataFrame df de strings para números inteiros.
+Aqui está uma explicação do que cada parte do código faz:
+•	le = LabelEncoder(): esta linha de código cria uma instância do LabelEncoder, que será usada para transformar os valores da coluna 'Sex'.
+•	df.Sex = le.fit_transform(df.Sex): esta linha de código aplica a transformação aos valores da coluna 'Sex'. O método fit_transform() do LabelEncoder ajusta o encoder aos dados de 'Sex' e, em seguida, transforma esses dados em números inteiros. Os valores originais da coluna 'Sex' são substituídos pelos valores transformados.
+Agora, a coluna 'Sex' do DataFrame df contém valores numéricos em vez de strings, tornando-a adequada para ser usada como entrada em algoritmos de aprendizado de máquina que requerem valores numéricos em vez de categóricos.
+________________________________________
+3.2.2 - Coluna Dataset
+A seguir temos uma explicação sequencial do que cada parte do código faz:
+•	A linha from sklearn.preprocessing import LabelEncoder importa a classe LabelEncoder da biblioteca scikit-learn. O LabelEncoder é usado para codificar variáveis categóricas em números inteiros.
+•	A linha le = LabelEncoder() cria uma instância do LabelEncoder. Esta instância será usada para realizar a codificação dos valores na coluna 'Dataset'.
+•	A linha df['Dataset'] = le.fit_transform(df['Dataset']) aplica o LabelEncoder à coluna 'Dataset' do DataFrame df. O método fit_transform() ajusta o encoder aos dados da coluna 'Dataset' e, em seguida, transforma esses dados em números inteiros. Os valores originais da coluna 'Dataset' são substituídos pelos valores transformados.
+•	A linha print(df['Dataset'].unique()) imprime os valores únicos na coluna 'Dataset' após a codificação.
+Isso é útil para verificar se a codificação foi bem-sucedida e entender a representação numérica dos diferentes rótulos na coluna 'Dataset', que agora é apresentada pelos valores binários 0 e 1.
+________________________________________
+3.3 - AVALIANDO CORRELAÇÕES
+Este trecho de código calcula a correlação de Pearson entre todas as colunas do DataFrame df e a coluna 'Dataset', e em seguida ordena essas correlações em ordem decrescente. Aqui está uma explicação do que cada parte do código faz:
+•	df.corr(): Esta parte do código calcula a matriz de correlação de Pearson para todas as colunas do DataFrame df. A correlação de Pearson mede a relação linear entre duas variáveis contínuas. O resultado é uma matriz em que cada entrada representa a correlação entre duas colunas.
+•	.Dataset: Depois de calcular a matriz de correlação, selecionamos a coluna 'Dataset'. Isso nos dá uma série pandas contendo as correlações entre todas as outras colunas e a coluna 'Dataset'. .sort_values(ascending=False):
+•	Esta parte do código ordena os valores da série em ordem decrescente. Como queremos identificar as correlações mais altas, usamos o parâmetro ascending=False para garantir que os valores mais altos apareçam primeiro na lista.
+Portanto, o resultado final demonstra as correlações de Pearson entre a coluna 'Dataset' e todas as outras colunas do DataFrame df, ordenadas em ordem decrescente de magnitude.
+Isso permite identificar quais características estão mais fortemente correlacionadas com a coluna 'Dataset'.
+________________________________________
+3.4 - SEPARANDO DADOS PARA TREINO E TESTE
+
+Este trecho de código a seguir divide os dados do DataFrame df em conjuntos de treinamento e validação para o modelo de aprendizado de máquina. Aqui está uma explicação do que cada parte do código faz:
+•	X = df.drop('Dataset', axis=1): esta linha de código cria um DataFrame X contendo todas as colunas de df, exceto a coluna 'Dataset'. Isso significa que X contém todas as características (features) que serão usadas para prever o rótulo 'Dataset'.
+•	y = df['Dataset']: esta linha de código cria uma série y contendo apenas a coluna 'Dataset'. Isso significa que y contém os rótulos que estamos tentando prever com base nas características em X.
+•	X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_state=7): esta linha de código divide os dados em conjuntos de treinamento e validação. X_train e y_train conterão as características e rótulos do conjunto de treinamento, enquanto X_val e y_val conterão as características e rótulos do conjunto de validação.
+•	O parâmetro test_size=0.2 especifica que 20% dos dados serão usados como conjunto de validação, enquanto 80% serão usados como conjunto de treinamento.
+•	O parâmetro random_state=7 garante que a divisão seja reproduzível, ou seja, produzirá os mesmos resultados sempre que for executada.
+•	O número '7' é apenas um valor arbitrário usado para inicializar o gerador de números aleatórios.
+________________________________________
+
+4 - MÁQUINA PREDITIVA E SEGMENTAÇÃO DE CLIENTES
+
+4.1 - CRIANDO BASELINE
+
+Este trecho de código a seguir constrói e treina um modelo de Random Forest Classifier usando os conjuntos de treinamento X_train e y_train.
+Aqui está uma explicação do que cada parte do código faz:
+•	RandomForestClassifier(): esta parte do código cria uma instância do classificador Random Forest. Não foram fornecidos parâmetros específicos para este construtor, portanto, serão usados os valores padrão para os hiperparâmetros do modelo.
+•	.fit(X_train, y_train): o método .fit() é chamado na instância do classificador Random Forest, e os conjuntos de treinamento X_train e y_train são passados como argumentos. Isso treina o modelo nos dados de treinamento, permitindo que ele aprenda a relação entre as características e os rótulos.
+•	model: o modelo treinado é armazenado na variável model. Essa variável agora contém o modelo de Random Forest treinado, que pode ser usado para fazer previsões em novos dados.
+O modelo treinado está agora armazenado na variável model, e está pronto para ser usado para fazer previsões sobre o conjunto de validação ou em novos conjuntos de dados.
+________________________________________
+4.2 CRIANDO MÁQUINA PREDITIVA
+
+Este trecho de código importa a classe XGBClassifier da biblioteca XGBoost.
+Aqui está uma explicação do que esta linha faz:
+•	from xgboost import XGBClassifier: esta linha de código importa a classe XGBClassifier da biblioteca XGBoost.
+O XGBClassifier é uma implementação do algoritmo XGBoost para problemas de classificação.
+O XGBoost é uma biblioteca popular para aprendizado de máquina que oferece alta eficiência e desempenho em conjuntos de dados grandes e complexos.
+________________________________________
+4.3 - TREINA MODELO
+Essa linha de código cria uma instância de um modelo XGBoost Classifier com os hiperparâmetros learning_rate definido como 0.2 e max_depth definido como 1 e, em seguida, ajusta (treina) o modelo usando os conjuntos de treinamento X_train e y_train.
+O modelo treinado é armazenado na variável model. Esta variável contém agora o modelo treinado, pronto para fazer previsões em novos dados ou ser avaliado em um conjunto de validação.
+________________________________________
+4.4 - PREVISÕES DO MODELO
+
+Essa linha de código a seguir realiza previsões usando o modelo treinado (model) nos dados de validação (X_val) e armazena as previsões resultantes na variável y_predict.
+Essas previsões são feitas com base nas características contidas em X_val, usando o modelo XGBoost treinado anteriormente para inferir os rótulos correspondentes.
+A variável y_predict agora contém as previsões do modelo para os dados de validação.
+Essas previsões podem ser comparadas com os rótulos reais (y_val) para avaliar o desempenho do modelo.
+________________________________________
+4.5 - COMPARANDO VALORES REAIS COM PREVISTOS
+O código a seguir traz uma explicação sequencial do que cada parte do código faz:
+•	O código utiliza a função pd.DataFrame() do pandas para criar um DataFrame a partir de um dicionário de dados. Cada chave do dicionário se torna uma coluna no DataFrame.
+•	A chave 'Gabarito(valor real)' no dicionário representa o nome da primeira coluna no DataFrame. Esta coluna é preenchida com os valores reais do conjunto de validação (y_val). Isso significa que cada linha nesta coluna contém o valor verdadeiro correspondente do conjunto de validação.
+•	A chave 'Previsão_Máquina_Preditiva' no dicionário representa o nome da segunda coluna no DataFrame. Esta coluna é preenchida com as previsões feitas pelo modelo (y_predict). Cada linha nesta coluna contém a previsão feita pelo modelo correspondente ao valor verdadeiro na mesma linha.
+Juntas, essas três partes do código criam um DataFrame que mostra os valores reais e as previsões feitas pelo modelo lado a lado, o que facilita a comparação entre as previsões do modelo e os valores reais do conjunto de validação.
+________________________________________
+5 - AVALIAÇÃO DA MÁQUINA PREDITIVA
+5.1 - TESTE DE DESEMPENHO
+Este código a seguir imprime várias métricas de avaliação do desempenho do modelo de classificação. Aqui está uma explicação sequencial do que cada parte do código faz:
+•	print('Classification metrics: \n', classification_report(y_val, y_predict)): esta linha de código imprime o relatório de classificação, que inclui várias métricas de avaliação, como precisão, recall, pontuação F1 e suporte, para cada classe. O classification_report é uma função do scikit-learn que gera este relatório.
+•	print('Acurácia: \n', accuracy_score(y_val, y_predict)): esta linha de código imprime a acurácia do modelo, que é a proporção de previsões corretas em relação ao número total de previsões. A função accuracy_score do scikit-learn é usada para calcular a acurácia.
+•	print('Confusion Matrix: \n', confusion_matrix(y_val, y_predict)): esta linha de código imprime a matriz de confusão, que é uma tabela que mostra o número de verdadeiros positivos, falsos positivos, verdadeiros negativos e falsos negativos. A função confusion_matrix do scikit-learn é usada para calcular a matriz de confusão.
+Juntas, essas linhas de código fornecem uma visão abrangente do desempenho do modelo de classificação em relação aos dados de validação, incluindo métricas detalhadas de precisão, recall e pontuação F1 para cada classe, além da acurácia geral e da matriz de confusão.
+Essas informações são úteis para avaliar a capacidade do modelo de fazer previsões precisas em diferentes classes.
+________________________________________
+6 - CONSIDERAÇÕES FINAIS
+Utilizando o método pré-estabelecido ao avaliar o problema a ser solucionado foi possível chegar a uma máquina preditiva com acurácia de 0.7327586206896551, o que é um resultado bastante satisfatório, já que o sistema detecta a possibilidade de doenças hepáticas levando em consideração os parâmetros disponíveis, em números arredondados, de 73 pessoas a cada 100.

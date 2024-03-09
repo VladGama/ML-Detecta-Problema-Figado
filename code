@@ -1,0 +1,138 @@
+#2 - ANÁLISE EXPLORATÓRIO DE DADOS
+#2.1 - IMPORTAÇÃO DAS BIBLIOTECAS DE ANÁLISE DE DADOS E VISUALIZAÇÃO
+
+import os
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+#2.2 - IMPORTAÇÃO DE BIBLIOTECAS E CLASSES ÚTEIS PARA AS TAREFAS DE MACHINE LEARNING
+from sklearn.preprocessing  import LabelEncoder
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble       import RandomForestClassifier
+
+from xgboost import XGBClassifier
+from xgboost import plot_importance
+
+from sklearn.metrics import classification_report
+from sklearn.metrics import accuracy_score
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
+
+import warnings
+warnings.filterwarnings ('ignore')
+
+#2.3 - IMPORTAÇÃO DE DADOS
+
+df=pd.read_csv ('/content/drive/MyDrive/Conteúdos CD Pro/6 Indian Liver Patient Dataset (ILPD).csv')
+
+#visualizando dataset
+
+df.info()
+
+df.head(10)
+
+#2.4 - DISTRIBUIÇÃO DE RÓTULOS
+
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# Visualizar a distribuição dos rótulos usando value_counts()
+
+print(df['Dataset'].value_counts())
+
+# Criar um gráfico de contagem
+
+sns.countplot(df['Dataset'])
+plt.show()
+
+# Look at breakdown of categorical feature(s)
+
+df['Sex'].value_counts()
+
+# Summarise
+
+df.describe()
+
+#3 - PRÉ-PROCESSAMENTO DE DADOS
+#3.1 - REMOÇÃO DE VALORES NULOS
+
+df.dropna(inplace=True)
+df.info()
+
+print(df)
+
+#3.2 - CONVERSÃO DE STRINGS EM VALORES NUMÉRICOS
+#3.2.1 - Coluna Sex
+
+from sklearn.preprocessing import LabelEncoder
+
+le = LabelEncoder()
+
+df['Sex'] = le.fit_transform(df['Sex'])
+
+print(df['Sex'].unique())
+
+df.columns
+
+#3.2.2 - Coluna Dataset
+
+from sklearn.preprocessing import LabelEncoder
+
+le = LabelEncoder()
+
+df['Dataset'] = le.fit_transform(df['Dataset'])
+
+print(df['Dataset'].unique())
+
+#3.3 - AVALIANDO CORRELAÇÕES
+
+df.corr().Dataset.sort_values(ascending=False)
+
+#AVALIANDO CORRELAÇÃO DE FORMA VISUAL
+f, ax = plt.subplots(figsize=(12,6))
+sns.heatmap(df.corr(), annot=True, fmt='.2f')
+
+#3.4 - SEPARANDO DADOS PARA TREINO E TESTE
+
+X = df.drop('Dataset', axis=1)
+y = df['Dataset']
+
+X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_state=7)
+
+#4 - MÁQUINA PREDITIVA E SEGMENTAÇÃO DE CLIENTES
+#4.1 - CRIANDO BASELINE
+
+model = RandomForestClassifier().fit(X_train,y_train)
+model
+
+#4.2 CRIANDO MÁQUINA PREDITIVA
+
+from xgboost import XGBClassifier
+
+#4.3 - TREINA MODELO
+model = XGBClassifier(learning_rate=0.2, max_depth=1).fit(X_train,y_train)
+model
+
+print(y_train.unique())
+
+#4.5 - COMPARA VALORES REAIS COM PREVISTOS
+
+actual_vs_predict = pd.DataFrame({'Gabarito(valor real)': y_val, 'Previsão_Máquina_Preditiva': y_predict})
+
+actual_vs_predict.sample(12)
+
+# plot feature importance
+plot_importance(model)
+plt.show()
+
+#5 - AVALIAÇÃO DA MÁQUINA PREDITIVA
+#5.1 - TESTE DE DESEMPENHO
+
+print('Classification metrics: \n', classification_report(y_val, y_predict))
+print('Acurácia: \n', accuracy_score(y_val, y_predict))
+print('Confusion Matrix: \n', confusion_matrix(y_val, y_predict,))
+
+cm = confusion_matrix(y_val, y_predict, normalize='all')
+cmd = ConfusionMatrixDisplay(cm, display_labels=['Doente','Saudável'])
+cmd.plot()
+
